@@ -80,15 +80,15 @@ export default function LoginPage() {
     if (!otp.trim()) return
     setLoading(true)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.verifyOtp({
-      phone,
-      token: otp,
-      type: 'sms',
+    const res = await fetch('/api/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, token: otp }),
     })
 
-    if (error) {
-      toast.error(error.message)
+    const data = await res.json()
+    if (!res.ok) {
+      toast.error(data.error ?? 'Verification failed')
       setLoading(false)
     } else {
       window.location.href = '/dashboard'
@@ -98,10 +98,16 @@ export default function LoginPage() {
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      toast.error(error.message)
+
+    const res = await fetch('/api/login-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const data = await res.json()
+    if (!res.ok) {
+      toast.error(data.error ?? 'Login failed')
       setLoading(false)
     } else {
       window.location.href = '/dashboard'
