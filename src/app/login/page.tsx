@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,15 @@ import { toast } from 'sonner'
 import { Home, Loader2, ChevronLeft } from 'lucide-react'
 
 type Screen = 'main' | 'phone-enter' | 'phone-otp' | 'email'
+
+function ErrorToast() {
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error) toast.error(`Auth error: ${error}`)
+  }, [searchParams])
+  return null
+}
 
 export default function LoginPage() {
   const [screen, setScreen] = useState<Screen>('main')
@@ -88,6 +98,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <Suspense><ErrorToast /></Suspense>
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
