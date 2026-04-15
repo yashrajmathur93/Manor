@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/login')
+    redirect('/login?reason=no_user')
   }
 
   const { data: profile } = await supabase
@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .single()
 
   if (!profile) {
-    redirect('/login')
+    redirect('/login?reason=no_profile')
   }
 
   return (

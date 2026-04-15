@@ -17,7 +17,9 @@ function ErrorToast() {
   const searchParams = useSearchParams()
   useEffect(() => {
     const error = searchParams.get('error')
+    const reason = searchParams.get('reason')
     if (error) toast.error(`Auth error: ${error}`)
+    if (reason) toast.error(`Redirected: ${reason}`)
   }, [searchParams])
   return null
 }
