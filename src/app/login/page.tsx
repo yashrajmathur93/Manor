@@ -32,13 +32,25 @@ export default function LoginPage() {
 
   async function handleGoogle() {
     setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    })
-    if (error) {
-      toast.error(error.message)
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      })
+      if (error) {
+        toast.error(`Google error: ${error.message}`)
+        setLoading(false)
+        return
+      }
+      if (data?.url) {
+        window.location.href = data.url
+      } else {
+        toast.error('No redirect URL returned')
+        setLoading(false)
+      }
+    } catch (e: unknown) {
+      toast.error(`Exception: ${e instanceof Error ? e.message : String(e)}`)
       setLoading(false)
     }
   }
