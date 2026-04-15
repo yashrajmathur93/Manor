@@ -14,17 +14,31 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/login?reason=no_user')
+    redirect('/login')
   }
 
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
   if (!profile) {
-    redirect('/login?reason=no_profile')
+    const { data: created } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        email: user.email ?? user.phone ?? null,
+        full_name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? 'New User',
+        role: 'staff',
+      })
+      .select()
+      .single()
+    profile = created
+  }
+
+  if (!profile) {
+    redirect('/login')
   }
 
   return (
